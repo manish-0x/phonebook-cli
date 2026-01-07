@@ -3,6 +3,14 @@
 
 const chat DATA_FILE_LOCATION[] = "./";
 const char DATA_FILE_NAME[] = "phonebook_data.txt";
+const NAME_LENGTH = 25;
+const NUMBER_LENGTH = 13;
+
+typedef struct contact
+{
+  char name[NAME_LENGTH + 1];
+  char number[NUMBER_LENGTH + 1];
+}contact;
 
 int main(void)
 {
