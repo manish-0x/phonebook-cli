@@ -12,9 +12,20 @@ typedef struct contact
   char number[NUMBER_LENGTH + 1];
 }contact;
 
+void menu();
+void add(contact*);
+void search(char* key, char* value);
+void update(contact*);
+void remove(contact*);
+
 int main(void)
 {
-  return 0;
+  menu();
+}
+
+void menu()
+{
+  printf("Ok");
 }
 
 // Use file handling with a text file to save, edit and retrieve data
