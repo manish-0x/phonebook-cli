@@ -25,7 +25,11 @@ int main(void)
 
 void menu()
 {
-  printf("Ok");
+  printf("********************\n";
+  printf("     Phone Book     \n");
+  printf("********************\") n;
+
+  printf("Choose an option and enter it to continue\n");
 }
 
 // Use file handling with a text file to save, edit and retrieve data
