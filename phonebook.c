@@ -17,30 +17,42 @@ void show_contacts();
 void add_contact();
 void search_contact();
 void update_contact();
-void remover_contact();
+void remove_contact();
 
 int main(void)
 {
-    int choice = 0;
+    char choice = '-', first_try = 'Y';
 
     menu();
     do
     {
-        scanf("%d", &choice);
-    } while (choice < 1 || choice > 5);
+        if (first_try == 'N')
+            printf("\nInvalid choice. Please try again.\n");
+        
+        printf("Only the first character of input will be considered as choice\n");
+        printf("Choice: ");
+        scanf("%c", &choice);
+        while (getchar() != '\n');
+        first_try = 'N';
+    } while (choice != '1' && choice != '2' && choice != '3' && choice != '4' && choice != '5');
 
-    // TODO: Add menu driver implimentation
+    // Menu driver implimentation
     switch (choice)
     {
-        case 1:
+        case '1':
+            show_contacts();
             break;
-        case 2:
+        case '2':
+            add_contact();
             break;
-        case 3:
+        case '3':
+            search_contact();
             break;
-        case 4:
+        case '4':
+            update_contact();
             break;
-        case 5:
+        case '5':
+            remove_contact();
             break;
     }
 }
@@ -57,8 +69,32 @@ void menu()
     printf("3. Search contact\n");
     printf("4. Edit contact\n");
     printf("5. Delete contact\n");
+    printf("\n");
+}
 
-    printf("\nChoice: ");
+void show_contacts()
+{
+    printf("Showing contacts");
+}
+
+void add_contact()
+{
+    printf("Adding contact");
+}
+
+void search_contact()
+{
+    printf("Searching contact");
+}
+
+void update_contact()
+{
+    printf("Updating contact");
+}
+
+void remove_contact()
+{
+    printf("Removing contact");
 }
 
 // Use file handling with a text file to save, edit and retrieve data
