@@ -1,8 +1,7 @@
 // Phonebook program source code
 /*
-BEWARE: Do not commit without testing. Changes have been made!
-
-TODO: Improve the program by making it defensive --- On progress
+TODO: Remove defensiveness and fix all functionality.
+Assume that the user always co-operates.
 TODO: Improve UI for better viewing, input and output experience
 */
 #include <stdio.h>
@@ -20,11 +19,11 @@ typedef struct
 }contact;
 
 void menu();
-void show_contacts();
-void add_contact();
-void search_contact();
-void update_contact();
-void remove_contact();
+int show_contacts();
+int add_contact();
+int search_contact();
+int update_contact();
+int remove_contact();
 
 int main(void)
 {
@@ -37,7 +36,6 @@ int main(void)
         {
             if (first_try == 'N')
                 printf("\nInvalid choice. Please try again.\n");
-            
             printf("Only the first character of input will be considered as choice\n");
             printf("Choice: ");
             scanf("%c", &choice);
@@ -49,22 +47,62 @@ int main(void)
                 );
 
         // Menu driver implimentation
+        int status = 0;
         switch (choice)
         {
             case '1':
-                show_contacts();
+                if (show_contacts() == 1)
+                {
+                    printf("Error opening data file.\n");
+                    printf("Try adding contacts first.\n");
+                }
                 break;
             case '2':
-                add_contact();
+                if (add_contact() == 2)
+                {
+                    printf("Error\n");
+                }
                 break;
             case '3':
-                search_contact();
+                if (search_contact() == 1)
+                {
+                    printf("Error opening data file.\n");
+                    printf("Try adding contacts first.\n");
+                }
                 break;
             case '4':
-                update_contact();
+                status = update_contact();
+                if (status == 1)
+                {
+                    printf("Error opening data file.\n");
+                    printf("Try adding contacts first.\n");
+                }
+                else if (status == 2)
+                {
+                    printf("Error\n");
+                }
+                else if (status == 3)
+                {
+                    printf("An unexpected error occurred\n");
+                }
+                status = 0;
                 break;
             case '5':
-                remove_contact();
+                status = remove_contact();
+                if (status == 1)
+                {
+                    printf("Error opening data file.\n");
+                    printf("Try adding contacts first.\n");
+                }
+                else if (status == 2)
+                {
+                    printf("Error\n");
+                }
+                else if (status == 3)
+                {
+                    printf("An unexpected error occurred\n");
+                }
+                status = 0;
                 break;
             case '6':
                 return 0;
@@ -90,16 +128,12 @@ void menu()
     printf("\n");
 }
 
-void show_contacts()
+int show_contacts()
 {
-    printf("Showing contacts\n");
+    printf("Showing all contacts...\n");
     FILE* file = fopen(DATA_FILE, "r");
     if (!file)
-    {
-        printf("Error opening data file.\n");
-        printf("Try adding contacts first.\n");
-        return;
-    }
+        return 1;
     unsigned int counter = 0;
 
     printf("\nSr.\tName\t\t\t\t\t\tNumber\n");
@@ -111,15 +145,17 @@ void show_contacts()
     printf("\nListed %d contacts from the Data file.\n", counter);
     
     fclose(file);
+
+    return 0;
 }
 
-void add_contact()
+int add_contact()
 {
-    printf("Adding contact\n");
+    printf("Add a contact...\n");
     char choice = '\n';
     FILE* file = fopen(DATA_FILE, "a");
     if (!file)
-        exit(2);
+        return 2;
 
     contact person;
     printf("Enter contact details.\n");
@@ -136,31 +172,30 @@ void add_contact()
     {
         printf("Choice (y/n): ");
         scanf("%c", &choice);
+        while (getchar() != '\n');
         if (choice == 'n' || choice == 'N')
         {
             printf("Cancelled\n");
             fclose(file);
-            return;
+            return 0;
         }
     }
     while (choice != 'y' && choice != 'Y');
     fprintf(file, "%s; %s\n", person.name, person.number);
 
     fclose(file);
+
+    return 0;
 }
 
-void search_contact()
+int search_contact()
 {
-    printf("Searching contact\n");
+    printf("Search a contact...\n");
     char choice = '\n';
     contact person;
     FILE* file = fopen(DATA_FILE, "r");
     if (!file)
-    {
-        printf("Error opening data file.\n");
-        printf("Try adding contacts first.\n");
-        return;
-    }
+        return 1;
 
     do
     {
@@ -187,10 +222,10 @@ void search_contact()
             if (strcmp(person.name, target_name) == 0)
                 printf("%d.\t%s\t\t\t\t\t\t%s\n", ++counter, person.name, person.number);
         }
-        printf("\nFound %d contacts having name \"%s\".\n", counter, target_name);
+        printf("\nFound %d contacts of name \"%s\".\n", counter, target_name);
     }
     else
-     {
+    {
         unsigned int counter = 0;
         char target_number[NUMBER_LENGTH + 1] = "\n";
         printf("Enter Number to search: ");
@@ -203,15 +238,17 @@ void search_contact()
             if (strcmp(person.number, target_number) == 0)
                 printf("%d.\t%s\t\t\t\t\t\t%s\n", ++counter, person.name, person.number);
         }
-        printf("\nFound %d contacts having number \"%s\".\n", counter, target_number);
+        printf("\nFound %d contacts of number \"%s\".\n", counter, target_number);
     }
 
     fclose(file);
+
+    return 0;
 }
 
-void update_contact()
+int update_contact()
 {
-    printf("Updating contact\n");
+    printf("Update a contact...\n");
     contact person;
     unsigned int counter = 0;
     unsigned int target_contact = 0;
@@ -230,22 +267,19 @@ void update_contact()
     } while (choice != '1' && choice != '2');
     */
 
-    printf("Showing contact list:\n");
-    show_contacts();
-    printf("\nSelect serial number of contact to edit: ");
+    // Showing contact list
+    if (show_contacts() == 1)
+        return 1;
+    printf("\nEnter serial number of contact to edit: ");
     scanf("%d", &target_contact);
     while (getchar() != '\n');
 
     FILE* file = fopen(DATA_FILE, "r");
     if (!file)
-    {
-        printf("Error opening data file.\n");
-        printf("Try adding contacts first.\n");
-        return;
-    }
+        return 3;
     FILE* temp = fopen("temp.txt", "w");
     if (!temp)
-        exit(1);
+        return 2;
     
     while (fscanf(file, "%[^;]; %[^\n]\n", &person.name, &person.number) != EOF)
     {
@@ -275,29 +309,28 @@ void update_contact()
     fclose(temp);
     remove(DATA_FILE);
     rename("temp.txt", DATA_FILE);
+
+    return 0;
 }
 
-void remove_contact()
+int remove_contact()
 {
     contact person;
     unsigned int target_contact = 0, counter = 0;
-    printf("Removing contact\n");
-    printf("Showing all contacts:\n");
-    show_contacts();
-    printf("Select contact serial to remove: ");
+    printf("Remove a contact...\n");
+    // Showing contact list
+    if (show_contacts() == 1)
+        return 1;
+    printf("Enter serial number of contact to remove: ");
     scanf("%d", &target_contact);
     while (getchar() != '\n');
 
     FILE* file = fopen(DATA_FILE, "r");
     if (!file)
-    {
-        printf("Error opening data file.\n");
-        printf("Try adding contacts first.\n");
-        return;
-    }
+        return 3;
     FILE* temp = fopen("temp.txt", "w");
     if (!temp)
-        exit(1);
+        return 2;
 
     while (fscanf(file, "%[^;]; %[^\n]\n", &person.name, &person.number) != EOF)
     {
@@ -309,7 +342,6 @@ void remove_contact()
     fclose(temp);
     remove(DATA_FILE);
     rename("temp.txt", DATA_FILE);
-}
 
-// Use file handling with a text file to save, edit and retrieve data
-// Simple CLI application basic layout with keyboard as primary input
+    return 0;
+}
