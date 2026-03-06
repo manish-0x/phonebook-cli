@@ -1,9 +1,5 @@
 // Phonebook program source code
-/*
-TODO: Remove defensiveness and fix all functionality.
-Assume that the user always co-operates.
-TODO: Improve UI for better viewing, input and output experience
-*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,14 +26,17 @@ int main(void)
     while (1)
     {
         char choice = '\n', first_try = 'Y';
-
-        menu();
         do
         {
-            if (first_try == 'N')
+            menu();
+            if (first_try == 'Y')
+                printf("Choice: ");
+            else
+            {
                 printf("\nInvalid choice. Please try again.\n");
-            printf("Only the first character of input will be considered as choice\n");
-            printf("Choice: ");
+                printf("Only the first character of input will be considered as choice\n");
+                printf("Choice: ");
+            }
             scanf("%c", &choice);
             while (getchar() != '\n');
             first_try = 'N';
@@ -55,12 +54,16 @@ int main(void)
                 {
                     printf("Error opening data file.\n");
                     printf("Try adding contacts first.\n");
+                    printf("Press Enter to continue...");
+                    getchar();
                 }
                 break;
             case '2':
                 if (add_contact() == 2)
                 {
                     printf("Error\n");
+                    printf("Press Enter to continue...");
+                    getchar();
                 }
                 break;
             case '3':
@@ -68,6 +71,8 @@ int main(void)
                 {
                     printf("Error opening data file.\n");
                     printf("Try adding contacts first.\n");
+                    printf("Press Enter to continue...");
+                    getchar();
                 }
                 break;
             case '4':
@@ -76,14 +81,20 @@ int main(void)
                 {
                     printf("Error opening data file.\n");
                     printf("Try adding contacts first.\n");
+                    printf("Press Enter to continue...");
+                    getchar();
                 }
                 else if (status == 2)
                 {
                     printf("Error\n");
+                    printf("Press Enter to continue...");
+                    getchar();
                 }
                 else if (status == 3)
                 {
                     printf("An unexpected error occurred\n");
+                    printf("Press Enter to continue...");
+                    getchar();
                 }
                 status = 0;
                 break;
@@ -93,14 +104,20 @@ int main(void)
                 {
                     printf("Error opening data file.\n");
                     printf("Try adding contacts first.\n");
+                    printf("Press Enter to continue...");
+                    getchar();
                 }
                 else if (status == 2)
                 {
                     printf("Error\n");
+                    printf("Press Enter to continue...");
+                    getchar();
                 }
                 else if (status == 3)
                 {
                     printf("An unexpected error occurred\n");
+                    printf("Press Enter to continue...");
+                    getchar();
                 }
                 status = 0;
                 break;
@@ -113,6 +130,7 @@ int main(void)
 
 void menu()
 {
+    system("cls");
     printf("********************\n");
     printf("     Phone Book     \n");
     printf("********************\n");
@@ -130,12 +148,13 @@ void menu()
 
 int show_contacts()
 {
-    printf("Showing all contacts...\n");
     FILE* file = fopen(DATA_FILE, "r");
     if (!file)
         return 1;
     unsigned int counter = 0;
 
+    system("cls");
+    printf("Showing all contacts...\n");
     printf("\nSr.\tName\t\t\t\t\t\tNumber\n");
     contact person;
     while (fscanf(file, "%[^;]; %[^\n]\n", &person.name, &person.number) != EOF)
@@ -145,19 +164,19 @@ int show_contacts()
     printf("\nListed %d contacts from the Data file.\n", counter);
     
     fclose(file);
-
+    printf("Press Enter to continue...");
+    getchar();
     return 0;
 }
 
 int add_contact()
 {
-    printf("Add a contact...\n");
-    char choice = '\n';
     FILE* file = fopen(DATA_FILE, "a");
     if (!file)
-        return 2;
-
+        return 2;    
+    
     contact person;
+    printf("Add a contact...\n");
     printf("Enter contact details.\n");
     printf("Name (Max %d characters): ", NAME_LENGTH);
     scanf("%[^\n]", &person.name);
@@ -168,15 +187,18 @@ int add_contact()
     printf("Add new contact:\n");
     printf("Name: %s\n", person.name);
     printf("Number: %s\n", person.number);
+    char choice = '\n';
     do
     {
-        printf("Choice (y/n): ");
+        printf("Confirm (y/n): ");
         scanf("%c", &choice);
         while (getchar() != '\n');
         if (choice == 'n' || choice == 'N')
         {
-            printf("Cancelled\n");
             fclose(file);
+            printf("Cancelled\n");
+            printf("Press Enter to continue...");
+            getchar();
             return 0;
         }
     }
@@ -184,25 +206,26 @@ int add_contact()
     fprintf(file, "%s; %s\n", person.name, person.number);
 
     fclose(file);
-
+    printf("Contact added successfully\n");
+    printf("Press Enter to continue...");
+    getchar();
     return 0;
 }
 
 int search_contact()
 {
-    printf("Search a contact...\n");
     char choice = '\n';
     contact person;
     FILE* file = fopen(DATA_FILE, "r");
     if (!file)
         return 1;
-
+    
     do
     {
         printf("Search contact by:\n");
         printf("1. Name\n");
         printf("2. Number\n");
-        printf("Only the first character is considered the choice input\n");
+        printf("Only the first character is considered as the choice input\n");
         printf("Choice: ");
         scanf("%c", &choice);
         while (getchar() != '\n');
@@ -224,7 +247,7 @@ int search_contact()
         }
         printf("\nFound %d contacts of name \"%s\".\n", counter, target_name);
     }
-    else
+    else if (choice == '2')
     {
         unsigned int counter = 0;
         char target_number[NUMBER_LENGTH + 1] = "\n";
@@ -240,18 +263,20 @@ int search_contact()
         }
         printf("\nFound %d contacts of number \"%s\".\n", counter, target_number);
     }
-
-    fclose(file);
-
+    else
+        printf("Invalide choice\n");
+    
+    fclose(file);    
+    printf("Press Enter to continue...");
+    getchar();
     return 0;
 }
 
 int update_contact()
 {
-    printf("Update a contact...\n");
     contact person;
-    unsigned int counter = 0;
-    unsigned int target_contact = 0;
+    unsigned int counter = 0, target_contact = 0;
+    char found = 'N';
 
     /*
     Potential feature upgrade. Cancelled in initial build process for simplicity
@@ -270,7 +295,7 @@ int update_contact()
     // Showing contact list
     if (show_contacts() == 1)
         return 1;
-    printf("\nEnter serial number of contact to edit: ");
+    printf("\nEnter serial number of the contact to edit: ");
     scanf("%d", &target_contact);
     while (getchar() != '\n');
 
@@ -285,31 +310,54 @@ int update_contact()
     {
         if (++counter == target_contact)
         {
+            found = 'Y';
             printf("Editing contact details of:\n");
-            printf("Name: %s\nNumber: %s", person.name, person.number);
+            printf("Name: %s\nNumber: %s\n\n", person.name, person.number);
             printf("New name: ");
             scanf("%[^\n]", &person.name);
             while (getchar() != '\n');
             printf("New number: ");
             scanf("%[^\n]", &person.number);
             while (getchar() != '\n');
+            char choice = '\n';
+            do
+            {
+                printf("Confirm (y/n): ");
+                scanf("%c", &choice);
+                while (getchar() != '\n');
+                if (choice == 'n' || choice == 'N')
+                {
+                    printf("Cancelled\n");
+                    fclose(file);
+                    fclose(temp);
+                    remove("temp.txt");
+                    printf("Press Enter to continue...");
+                    getchar();
+                    return 0;
+                }
+            }
+            while (choice != 'y' && choice != 'Y');
             fprintf(temp, "%s; %s\n", person.name, person.number);
         }
         else
             fprintf(temp, "%s; %s\n", person.name, person.number);
     }
 
-    /*
-    printf("=====Removing\n");
-    if (!remove(DATA_FILE))
-        printf("Unable");
-    */
+    if (found == 'N')
+    {
+        fclose(file);
+        fclose(temp);
+        remove("temp.txt");
+        return 3;
+    }
 
     fclose(file);
     fclose(temp);
     remove(DATA_FILE);
     rename("temp.txt", DATA_FILE);
-
+    printf("Contact updated successfully\n");
+    printf("Press Enter to continue...");
+    getchar();
     return 0;
 }
 
@@ -317,7 +365,8 @@ int remove_contact()
 {
     contact person;
     unsigned int target_contact = 0, counter = 0;
-    printf("Remove a contact...\n");
+    char found = 'N';
+
     // Showing contact list
     if (show_contacts() == 1)
         return 1;
@@ -335,7 +384,39 @@ int remove_contact()
     while (fscanf(file, "%[^;]; %[^\n]\n", &person.name, &person.number) != EOF)
     {
         if (++counter != target_contact)
+        {
             fprintf(temp, "%s; %s\n", person.name, person.number);
+        }
+        else
+        {
+            found = 'Y';
+            char choice = '\n';
+            do
+            {
+                printf("Confirm (y/n): ");
+                scanf("%c", &choice);
+                while (getchar() != '\n');
+                if (choice == 'n' || choice == 'N')
+                {
+                    fclose(file);
+                    fclose(temp);
+                    remove("temp.txt");
+                    printf("Cancelled\n");
+                    printf("Press Enter to continue...");
+                    getchar();
+                    return 0;
+                }
+            }
+            while (choice != 'y' && choice != 'Y');
+        }
+    }
+
+    if (found == 'N')
+    {
+        fclose(file);
+        fclose(temp);
+        remove("temp.txt");
+        return 3;
     }
     
     fclose(file);
